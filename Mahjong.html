@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mahjong - Velvet Palace Casino</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #111;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .nav-links a {
+      color: #d4af37;
+      text-decoration: none;
+      padding: 12px 24px;
+      display: inline-block;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 8px 20px;
+      border-radius: 30px;
+      color: #d4af37;
+      font-size: 18px;
+      border: 1px solid #d4af37;
+    }
+
+    .game-container {
+      text-align: center;
+      padding: 40px;
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      border: 2px solid #d4af37;
+      margin: 20px;
+    }
+
+    .game-container h1 {
+      font-size: 32px;
+      color: #d4af37;
+    }
+
+    .tiles-container {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-gap: 10px;
+      margin-top: 20px;
+      justify-items: center;
+    }
+
+    .tile {
+      background-color: #111;
+      color: #d4af37;
+      width: 80px;
+      height: 80px;
+      text-align: center;
+      line-height: 80px;
+      border-radius: 8px;
+      font-size: 24px;
+      cursor: pointer;
+      border: 2px solid #d4af37;
+      transition: transform 0.3s ease;
+    }
+
+    .tile:hover {
+      transform: scale(1.1);
+      background-color: #d4af37;
+      color: #111;
+    }
+
+    .tile.selected {
+      background-color: #ff6347;
+    }
+
+    .tile.matched {
+      background-color: #32cd32;
+      color: #fff;
+      cursor: default;
+    }
+
+    .notification {
+      font-family: 'Playfair Display', serif;
+      background-color: #1f1f1f;
+      color: #d4af37;
+      padding: 15px;
+      margin-top: 20px;
+      font-size: 20px;
+      border-radius: 8px;
+      display: inline-block;
+      opacity: 1;
+      transition: opacity 1s ease-out;
+    }
+
+    .hidden {
+      opacity: 0;
+    }
+
+    #timer {
+      font-size: 24px;
+      margin-top: 20px;
+      color: #d4af37;
+    }
+
+    #startGameButton {
+      background-color: #d4af37;
+      color: #111;
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 30px;
+      transition: background-color 0.3s ease;
+    }
+
+    #startGameButton:hover {
+      background-color: #ff6347;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="games.html">Games</a>
+      <a href="shop.html">Shop</a>
+      <a href="rewards.html">Rewards</a>
+    </div>
+    <div class="coin-counter">Coins: <span id="coinCount">5000</span></div>
+  </div>
+
+  <div class="game-container">
+    <h1>Mahjong</h1>
+    <div id="notification" class="notification hidden"></div>
+
+    <div class="tiles-container" id="tilesContainer">
+      <!-- Tiles will be dynamically created here -->
+    </div>
+
+    <div id="timer">Time Left: 1:00</div>
+
+    <button id="startGameButton">Start Game</button>
+  </div>
+
+  <script>
+    let coinCount = 5000;
+    let tiles = [];
+    let selectedTiles = [];
+    let timer;
+    let timeLeft = 60; // 1 minute timer
+    let gameStarted = false;
+    const tileValues = [
+      "🐉", "🐉", "🐅", "🐅", "💎", "💎", "🎴", "🎴", "🀄", "🀄", "🀄", "🀄", "🐲", "🐲", "🀀", "🀀",
+      "🀂", "🀂", "🌸", "🌸", "☯", "☯"
+    ];
+
+    // Update coin count
+    document.getElementById('coinCount').textContent = coinCount;
+
+    // Create the tiles and shuffle them
+    function createTiles() {
+      let shuffledTiles = [...tileValues, ...tileValues]; // Double the tiles for matching
+      shuffledTiles = shuffledTiles.sort(() => Math.random() - 0.5); // Shuffle the tiles
+
+      const tilesContainer = document.getElementById('tilesContainer');
+      tilesContainer.innerHTML = ''; // Clear existing tiles
+
+      shuffledTiles.forEach((value, index) => {
+        const tile = document.createElement('div');
+        tile.classList.add('tile');
+        tile.innerText = value;
+        tile.dataset.id = index; // Assign a unique id to each tile for reference
+        tile.addEventListener('click', () => handleTileClick(tile));
+        tiles.push(tile);
+        tilesContainer.appendChild(tile);
+      });
+    }
+
+    // Handle tile click
+    function handleTileClick(tile) {
+      if (selectedTiles.length < 2 && !tile.classList.contains('matched') && !tile.classList.contains('selected')) {
+        tile.classList.add('selected');
+        selectedTiles.push(tile);
+
+        if (selectedTiles.length === 2) {
+          checkMatch();
+        }
+      }
+    }
+
+    // Check if the selected tiles match
+    function checkMatch() {
+      const [tile1, tile2] = selectedTiles;
+      if (tile1.innerText === tile2.innerText) {
+        tile1.classList.add('matched');
+        tile2.classList.add('matched');
+        selectedTiles = [];
+        showNotification("You matched tiles! 🎉");
+        checkGameOver();
+      } else {
+        setTimeout(() => {
+          tile1.classList.remove('selected');
+          tile2.classList.remove('selected');
+          selectedTiles = [];
+        }, 500);
+      }
+    }
+
+    // Check if the game is over (no more unmatched tiles)
+    function checkGameOver() {
+      const unmatchedTiles = tiles.filter(tile => !tile.classList.contains('matched'));
+      if (unmatchedTiles.length === 0) {
+        showNotification("Congratulations, you won! 🎉");
+        setTimeout(() => {
+          // Calculate winnings based on time left
+          const winnings = calculateWinnings(timeLeft);
+          coinCount += winnings;
+          document.getElementById('coinCount').textContent = coinCount;
+
+          createTiles(); // Restart the game
+        }, 2000);
+      }
+    }
+
+    // Show the notification with a message
+    function showNotification(message) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.remove('hidden');
+      setTimeout(() => {
+        notification.classList.add('hidden');
+      }, 1000);
+    }
+
+    // Calculate winnings based on time left
+    function calculateWinnings(timeLeft) {
+      let multiplier = 1;
+      if (timeLeft > 40) {
+        multiplier = 2; // Double the win if more than 40 seconds remain
+      } else if (timeLeft > 20) {
+        multiplier = 1.5; // 1.5x win for more than 20 seconds
+      } else {
+        multiplier = 1; // Standard win
+      }
+      return Math.floor(50 * multiplier); // Winnings based on cost of game (50 coins)
+    }
+
+    // Start the game
+    document.getElementById('startGameButton').addEventListener('click', () => {
+      if (coinCount < 50) {
+        alert("Not enough coins to play!");
+        return;
+      }
+
+      coinCount -= 50;
+      document.getElementById('coinCount').textContent = coinCount;
+
+      // Start the timer
+      gameStarted = true;
+      startTimer();
+      createTiles();
+    });
+
+    // Timer function
+    function startTimer() {
+      timer = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          showNotification("Time's up! You lost!");
+          createTiles(); // Restart the game
+          return;
+        }
+
+        timeLeft--;
+        document.getElementById('timer').textContent = `Time Left: ${formatTime(timeLeft)}`;
+      }, 1000);
+    }
+
+    // Format the time to mm:ss
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    }
+  </script>
+
+</body>
+</html>

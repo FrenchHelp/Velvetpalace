@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Texas Hold'em Poker - Velvet Palace Casino</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap');
+
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #111;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .nav-links a {
+      color: #d4af37;
+      text-decoration: none;
+      padding: 12px 24px;
+      display: inline-block;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 8px 20px;
+      border-radius: 30px;
+      color: #d4af37;
+      font-size: 18px;
+      border: 1px solid #d4af37;
+    }
+
+    .game-container {
+      text-align: center;
+      padding: 40px;
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      border: 2px solid #d4af37;
+      margin: 20px;
+    }
+
+    .game-container h1 {
+      font-size: 32px;
+      color: #d4af37;
+    }
+
+    .card {
+      display: inline-block;
+      width: 50px;
+      height: 80px;
+      background-color: #fff;
+      margin: 5px;
+      text-align: center;
+      line-height: 80px;
+      color: #000;
+      border-radius: 8px;
+      font-size: 18px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .button-container {
+      margin-top: 30px;
+    }
+
+    button {
+      background-color: #d4af37;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      color: #111;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #b68c2b;
+    }
+
+    .action-log {
+      margin-top: 20px;
+      color: #fff;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="games.html">Games</a>
+      <a href="shop.html">Shop</a>
+      <a href="rewards.html">Rewards</a>
+    </div>
+    <div class="coin-counter">Coins: <span id="coinCount">5000</span></div>
+  </div>
+
+  <div class="game-container">
+    <h1>Texas Hold'em Poker</h1>
+
+    <!-- Player's Cards -->
+    <div id="player-cards">
+      <div class="card">🂠</div>
+      <div class="card">🂠</div>
+    </div>
+
+    <h3>Community Cards</h3>
+    <div id="community-cards">
+      <div class="card">🂠</div>
+      <div class="card">🂠</div>
+      <div class="card">🂠</div>
+      <div class="card">🂠</div>
+      <div class="card">🂠</div>
+    </div>
+
+    <div class="button-container">
+      <button id="startGameButton">Start Game</button>
+      <button id="betButton" style="display:none;">Place Bet (50 Coins)</button>
+    </div>
+
+    <div class="action-log" id="actionLog"></div>
+  </div>
+
+  <script>
+    let coinCount = 5000;
+    let playerCards = [];
+    let communityCards = [];
+    let deck = [];
+    let log = document.getElementById('actionLog');
+    
+    // Update coin count
+    document.getElementById('coinCount').textContent = coinCount;
+
+    // Initialize deck of cards
+    function createDeck() {
+      const suits = ['♠', '♣', '♦', '♥'];
+      const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+      
+      deck = [];
+      suits.forEach(suit => {
+        values.forEach(value => {
+          deck.push(value + suit);
+        });
+      });
+    }
+
+    // Shuffle deck
+    function shuffleDeck() {
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+    }
+
+    // Deal cards
+    function dealCards() {
+      playerCards = [deck.pop(), deck.pop()];
+      communityCards = [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
+
+      // Display player's cards
+      const playerCardsDiv = document.getElementById('player-cards');
+      playerCardsDiv.innerHTML = '';
+      playerCards.forEach(card => {
+        playerCardsDiv.innerHTML += `<div class="card">${card}</div>`;
+      });
+
+      // Display community cards
+      const communityCardsDiv = document.getElementById('community-cards');
+      communityCardsDiv.innerHTML = '';
+      communityCards.forEach(card => {
+        communityCardsDiv.innerHTML += `<div class="card">${card}</div>`;
+      });
+    }
+
+    // Log actions
+    function logAction(message) {
+      log.textContent = message;
+    }
+
+    // Start game function
+    document.getElementById('startGameButton').addEventListener('click', function() {
+      if (coinCount < 50) {
+        alert('Not enough coins to play.');
+        return;
+      }
+
+      coinCount -= 50; // Deduct cost of the game
+      document.getElementById('coinCount').textContent = coinCount;
+
+      // Shuffle and deal
+      createDeck();
+      shuffleDeck();
+      dealCards();
+
+      // Show betting button
+      document.getElementById('betButton').style.display = 'inline-block';
+      logAction('Game started! Your cards are dealt.');
+    });
+
+    // Handle bet button click
+    document.getElementById('betButton').addEventListener('click', function() {
+      // Evaluate hand
+      const hand = evaluateHand(playerCards, communityCards);
+      if (hand === 'Royal Flush') {
+        coinCount += 1000; // Huge win for royal flush
+        logAction('You won with a Royal Flush! You won 1000 coins!');
+      } else if (hand === 'Straight Flush') {
+        coinCount += 500; // Big win for straight flush
+        logAction('You won with a Straight Flush! You won 500 coins!');
+      } else if (hand === 'Four of a Kind') {
+        coinCount += 200; // Big win for four of a kind
+        logAction('You won with Four of a Kind! You won 200 coins!');
+      } else if (hand === 'Full House') {
+        coinCount += 150; // Win for full house
+        logAction('You won with a Full House! You won 150 coins!');
+      } else if (hand === 'Flush') {
+        coinCount += 100; // Win for flush
+        logAction('You won with a Flush! You won 100 coins!');
+      } else if (hand === 'Straight') {
+        coinCount += 75; // Win for straight
+        logAction('You won with a Straight! You won 75 coins!');
+      } else if (hand === 'Three of a Kind') {
+        coinCount += 50; // Win for three of a kind
+        logAction('You won with Three of a Kind! You won 50 coins!');
+      } else if (hand === 'Two Pair') {
+        coinCount += 30; // Win for two pair
+        logAction('You won with Two Pair! You won 30 coins!');
+      } else if (hand === 'Pair') {
+        coinCount += 20; // Win for pair
+        logAction('You won with a Pair! You won 20 coins!');
+      } else {
+        logAction('You lost this round.');
+      }
+
+      document.getElementById('coinCount').textContent = coinCount;
+      document.getElementById('betButton').style.display = 'none';
+    });
+
+    // Hand evaluation function (expanded)
+    function evaluateHand(playerCards, communityCards) {
+      const allCards = playerCards.concat(communityCards);
+      const values = allCards.map(card => card.slice(0, -1)); // Remove suits
+      const suits = allCards.map(card => card.slice(-1)); // Get suits
+
+      // Check for flush (all suits are the same)
+      const isFlush = suits.every(suit => suit === suits[0]);
+
+      // Check for straight (consecutive values)
+      const sortedValues = values.map(value => {
+        if (value === 'J') return 11;
+        if (value === 'Q') return 12;
+        if (value === 'K') return 13;
+        if (value === 'A') return 14;
+        return parseInt(value);
+      }).sort((a, b) => a - b);
+
+      const isStraight = sortedValues.every((val, index) => index === 0 || val === sortedValues[index - 1] + 1);
+
+      // Count occurrences of each value
+      const valueCounts = values.reduce((acc, value) => {
+        acc[value] = (acc[value] || 0) + 1;
+        return acc;
+      }, {});
+
+      const counts = Object.values(valueCounts).sort((a, b) => b - a);
+
+      // Determine hand type
+      if (isFlush && isStraight && sortedValues[0] === 10) return 'Royal Flush';
+      if (isFlush && isStraight) return 'Straight Flush';
+      if (counts[0] === 4) return 'Four of a Kind';
+      if (counts[0] === 3 && counts[1] === 2) return 'Full House';
+      if (isFlush) return 'Flush';
+      if (isStraight) return 'Straight';
+      if (counts[0] === 3) return 'Three of a Kind';
+      if (counts[0] === 2 && counts[1] === 2) return 'Two Pair';
+      if (counts[0] === 2) return 'Pair';
+      return 'High Card';
+    }
+
+  </script>
+
+</body>
+</html>

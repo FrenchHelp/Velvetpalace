@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velvet Palace Casino - Shop</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- Favicon added -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap');
+
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #111;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .nav-links a {
+      color: #d4af37;
+      text-decoration: none;
+      padding: 12px 24px;
+      display: inline-block;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 8px 20px;
+      border-radius: 30px;
+      color: #d4af37;
+      font-size: 18px;
+      border: 1px solid #d4af37;
+    }
+
+    .shop-container {
+      padding: 40px;
+      text-align: center;
+    }
+
+    .shop-container h2 {
+      font-size: 32px;
+      margin-bottom: 40px;
+      color: #d4af37;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .mystery-box {
+      display: inline-block;
+      text-align: center;
+      margin: 15px;
+      background-color: #1f1f1f;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid #d4af37;
+      width: 180px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .mystery-box:hover {
+      background-color: #d4af37;
+      color: #111;
+    }
+
+    .mystery-box span {
+      font-size: 50px;
+      display: block;
+    }
+
+    .mystery-box p {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    .box-price {
+      font-size: 20px;
+      color: #b28f2f;
+      margin-top: 10px;
+    }
+
+    .win-message {
+      font-size: 18px;
+      margin-top: 15px;
+      color: #00ff00;
+      font-weight: bold;
+      opacity: 1;
+      transition: opacity 1s ease-out;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="games.html">Games</a>
+      <a href="rewards.html">Rewards</a>
+    </div>
+    <div class="coin-counter">Coins: <span id="coinCount">1000</span></div>
+  </div>
+
+  <div class="shop-container">
+    <h2>Shop - Mystery Boxes</h2>
+
+    <!-- Tiny Box -->
+    <div class="mystery-box" onclick="buyBox(100, 'Tiny Mystery Box', this)">
+      <span>📦</span>
+      <p>Tiny Mystery Box</p>
+      <p class="box-price">Price: 100 Coins</p>
+      <p class="win-message" id="win-message-100"></p>
+    </div>
+
+    <!-- Small Box -->
+    <div class="mystery-box" onclick="buyBox(250, 'Small Mystery Box', this)">
+      <span>📦</span>
+      <p>Small Mystery Box</p>
+      <p class="box-price">Price: 250 Coins</p>
+      <p class="win-message" id="win-message-250"></p>
+    </div>
+
+    <!-- Medium Box -->
+    <div class="mystery-box" onclick="buyBox(500, 'Medium Mystery Box', this)">
+      <span>📦</span>
+      <p>Medium Mystery Box</p>
+      <p class="box-price">Price: 500 Coins</p>
+      <p class="win-message" id="win-message-500"></p>
+    </div>
+
+    <!-- Large Box -->
+    <div class="mystery-box" onclick="buyBox(1000, 'Large Mystery Box', this)">
+      <span>📦</span>
+      <p>Large Mystery Box</p>
+      <p class="box-price">Price: 1000 Coins</p>
+      <p class="win-message" id="win-message-1000"></p>
+    </div>
+
+    <!-- Massive Box -->
+    <div class="mystery-box" onclick="buyBox(2500, 'Massive Mystery Box', this)">
+      <span>📦</span>
+      <p>Massive Mystery Box</p>
+      <p class="box-price">Price: 2500 Coins</p>
+      <p class="win-message" id="win-message-2500"></p>
+    </div>
+  </div>
+
+  <script>
+    // Retrieve the coin count from localStorage
+    if (!localStorage.getItem('coinCount')) {
+      localStorage.setItem('coinCount', '1000');
+    }
+    let coinCount = parseInt(localStorage.getItem('coinCount'));
+    document.getElementById('coinCount').textContent = coinCount;
+
+    // Function to update the coin count across pages
+    function updateCoinCount() {
+      localStorage.setItem('coinCount', coinCount.toString());
+      document.getElementById('coinCount').textContent = coinCount;
+    }
+
+    // Function to handle mystery box purchases
+    function buyBox(cost, boxName, boxElement) {
+      if (coinCount >= cost) {
+        // Deduct the cost from the coin count
+        coinCount -= cost;
+        updateCoinCount();
+
+        // Randomize the win amount (between 1x and 3x the cost)
+        const winAmount = Math.floor(Math.random() * (cost * 3 - cost + 1)) + cost;
+
+        // Update the message with the win amount
+        const winMessage = boxElement.querySelector('.win-message');
+        winMessage.textContent = `🎉 You won ${winAmount} coins! 🎁`;
+
+        // Increase the coin count with the winnings
+        coinCount += winAmount;
+        updateCoinCount();
+
+        // Fade out the message after 1 second
+        setTimeout(() => {
+          winMessage.style.opacity = 0;
+        }, 1000);
+      } else {
+        const winMessage = boxElement.querySelector('.win-message');
+        winMessage.textContent = '❌ You don\'t have enough coins!';
+
+        // Fade out the message after 1 second
+        setTimeout(() => {
+          winMessage.style.opacity = 0;
+        }, 1000);
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velvet Palace Casino</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #111;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .nav-links a {
+      color: #d4af37;
+      text-decoration: none;
+      padding: 12px 24px;
+      display: inline-block;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 8px 20px;
+      border-radius: 30px;
+      color: #d4af37;
+      font-size: 18px;
+      border: 1px solid #d4af37;
+    }
+
+    .welcome-container {
+      text-align: center;
+      padding: 50px;
+    }
+
+    .welcome-container h1 {
+      font-size: 48px;
+      color: #d4af37;
+      margin-bottom: 20px;
+    }
+
+    .welcome-container p {
+      font-size: 24px;
+      color: #d4af37;
+    }
+
+    .game-links {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+            text-decoration: none;
+
+    }
+
+    .game-link {
+      text-align: center;
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      padding: 20px;
+      border: 2px solid #d4af37;
+      width: 150px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+            text-decoration: none;
+
+    }
+
+    .game-link:hover {
+      background-color: #d4af37;
+      color: #111;
+            text-decoration: none;
+
+    }
+
+    .game-link span {
+      font-size: 40px;
+      display: block;
+      margin-bottom: 10px;
+            text-decoration: none;
+
+    }
+
+    .game-link p {
+      font-size: 18px;
+      margin: 0;
+            text-decoration: none;
+
+    }
+
+    .rewards-container {
+      padding: 40px;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    .rewards-container h2 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: #d4af37;
+    }
+
+    .reward {
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      padding: 20px;
+      border: 2px solid #d4af37;
+      width: 200px;
+      margin: 20px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .reward span {
+      font-size: 40px;
+      display: block;
+    }
+
+    .reward p {
+      font-size: 18px;
+    }
+    a {      text-decoration: none;
+}
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="games.html">Games</a>
+      <a href="shop.html">Shop</a>
+      <a href="rewards.html">Rewards</a>
+    </div>
+    <div class="coin-counter">Coins: <span id="coinCount">1000</span></div>
+  </div>
+
+  <div class="welcome-container">
+    <h1>Welcome to Velvet Palace Casino</h1>
+    <p>Your adventure begins here! Choose a game below to start playing. 🎰</p>
+
+    <div class="game-links">
+      <div class="game-link">
+        <a href="slots.html">
+          <span>🎰</span>
+          <p>Slots</p>
+        </a>
+      </div>
+      <div class="game-link">
+        <a href="poker.html">
+          <span>🃏</span>
+          <p>Poker</p>
+        </a>
+      </div>
+      <div class="game-link">
+        <a href="craps.html">
+          <span>🎲</span>
+          <p>Craps</p>
+        </a>
+      </div>
+      <div class="game-link">
+        <a href="mahjong.html">
+          <span>🀄</span>
+          <p>Mahjong</p>
+        </a>
+      </div>
+      <div class="game-link">
+        <a href="blackjack.html">
+          <span>🏆</span>
+          <p>Blackjack</p>
+        </a>
+      </div>
+      <div class="game-link">
+        <a href="fantasyspin.html">
+          <span>🦄</span>
+          <p>Fantasy Spin</p>
+        </a>
+      </div>
+      <div class="game-link">
+        <a href="dragonsluck.html">
+          <span>🐉</span>
+          <p>Dragon's Luck</p>
+        </a>
+      </div>
+      <div class="game-link">
+        <a href="billiards.html">
+          <span>🎱</span>
+          <p>Billiards</p>
+        </a>
+      </div>
+      <div class="game-link">
+        <a href="gemrush.html">
+          <span>💎</span>
+          <p>Gem Rush</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="rewards-container">
+    <h2>Featured Rewards</h2>
+    <div class="reward">
+      <span>🎁</span>
+      <p>Free Spins</p>
+    </div>
+    <div class="reward">
+      <span>🎁</span>
+      <p>VIP Entry</p>
+    </div>
+    <div class="reward">
+      <span>🎁</span>
+      <p>Cashback Offer</p>
+    </div>
+    <div class="reward">
+      <span>🎁</span>
+      <p>High Risk, High Reward</p>
+    </div>
+  </div>
+
+  <script>
+    // Retrieve coin count from local storage, default to 1000 if not found
+    let coinCount = localStorage.getItem('coinCount') ? parseInt(localStorage.getItem('coinCount')) : 1000;
+    document.getElementById('coinCount').textContent = coinCount;
+
+    // Update coin count in local storage whenever it changes
+    function updateCoinCount(newAmount) {
+      coinCount = newAmount;
+      localStorage.setItem('coinCount', coinCount);
+      document.getElementById('coinCount').textContent = coinCount;
+    }
+  </script>
+</body>
+</html>

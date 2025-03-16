@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velvet Palace Casino - Games</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- Favicon added -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap');
+
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #111;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .nav-links a {
+      color: #d4af37;
+      text-decoration: none;
+      padding: 12px 24px;
+      display: inline-block;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 8px 20px;
+      border-radius: 30px;
+      color: #d4af37;
+      font-size: 18px;
+      border: 1px solid #d4af37;
+    }
+
+    .games-container {
+      padding: 40px;
+      text-align: center;
+    }
+
+    .games-container h2 {
+      font-size: 32px;
+      margin-bottom: 40px;
+      color: #d4af37;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .game-card {
+      display: inline-block;
+      text-align: center;
+      margin: 20px;
+      background-color: #1f1f1f;
+      padding: 30px;
+      border-radius: 12px;
+      border: 2px solid #d4af37;
+      width: 250px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .game-card:hover {
+      background-color: #d4af37;
+      color: #111;
+    }
+
+    .game-card span {
+      font-size: 50px;
+      display: block;
+    }
+
+    .game-card p {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="rewards.html">Rewards</a>
+    </div>
+    <div class="coin-counter">Coins: <span id="coinCount">1000</span></div>
+  </div>
+
+  <div class="games-container">
+    <h2>Our Popular Games</h2>
+
+    <!-- Slots Game -->
+    <div class="game-card" onclick="window.location.href='slots.html'">
+      <span>🎰</span>
+      <p>Slots</p>
+      <p>Spin the reels and win big! Enjoy classic and modern slot machines with various themes.</p>
+    </div>
+
+    <!-- Poker Game -->
+    <div class="game-card" onclick="window.location.href='poker.html'">
+      <span>🃏</span>
+      <p>Poker</p>
+      <p>Test your skills and strategy in classic Texas Hold'em poker. Can you beat the best?</p>
+    </div>
+
+    <!-- Craps Game -->
+    <div class="game-card" onclick="window.location.href='craps.html'">
+      <span>🎲</span>
+      <p>Craps</p>
+      <p>Roll the dice and bet on your luck. Can you predict the outcome and win big?</p>
+    </div>
+
+    <!-- Mahjong Game -->
+    <div class="game-card" onclick="window.location.href='mahjong.html'">
+      <span>🀄</span>
+      <p>Mahjong</p>
+      <p>Enjoy the ancient game of Mahjong. Match tiles and unlock exciting bonuses.</p>
+    </div>
+
+    <!-- Blackjack Game -->
+    <div class="game-card" onclick="window.location.href='blackjack.html'">
+      <span>🏆</span>
+      <p>Blackjack</p>
+      <p>Beat the dealer and get a 21! Classic Blackjack with exciting twists for every hand.</p>
+    </div>
+
+    <!-- Fantasy Spin Game -->
+    <div class="game-card" onclick="window.location.href='fantasyspin.html'">
+      <span>🦄</span>
+      <p>Fantasy Spin</p>
+      <p>Spin the fantasy wheel and enter a magical world full of rewards and surprises!</p>
+    </div>
+
+    <!-- Dragon's Luck Game -->
+    <div class="game-card" onclick="window.location.href='dragonsluck.html'">
+      <span>🐉</span>
+      <p>Dragon's Luck</p>
+      <p>Unleash the power of the dragon and watch as your luck soars to new heights!</p>
+    </div>
+
+    <!-- Billiards Game -->
+    <div class="game-card" onclick="window.location.href='billiards.html'">
+      <span>🎱</span>
+      <p>Billiards</p>
+      <p>Sink the balls and pocket your way to victory in this smooth and relaxing game.</p>
+    </div>
+
+    <!-- Gem Rush Game -->
+    <div class="game-card" onclick="window.location.href='gemrush.html'">
+      <span>💎</span>
+      <p>Gem Rush</p>
+      <p>Dig for precious gems and claim your riches. Can you find the rarest gems?</p>
+    </div>
+  </div>
+
+  <script>
+    // Retrieve the coin count from localStorage
+    if (!localStorage.getItem('coinCount')) {
+      localStorage.setItem('coinCount', '1000');
+    }
+    let coinCount = parseInt(localStorage.getItem('coinCount'));
+    document.getElementById('coinCount').textContent = coinCount;
+
+    // Function to update the coin count across pages
+    function updateCoinCount() {
+      localStorage.setItem('coinCount', coinCount.toString());
+      document.getElementById('coinCount').textContent = coinCount;
+    }
+  </script>
+
+</body>
+</html>

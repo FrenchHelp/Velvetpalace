@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velvet Palace Casino - VIP Entrance</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- Favicon added -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap');
+
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .welcome-container {
+      margin-top: 100px;
+      padding: 50px;
+      background-color: #111;
+      border-radius: 12px;
+      border: 2px solid #d4af37;
+      text-align: center;
+    }
+
+    .welcome-container h1 {
+      font-size: 48px;
+      color: #d4af37;
+      margin-bottom: 20px;
+    }
+
+    .welcome-container p {
+      font-size: 24px;
+      color: #d4af37;
+      margin-bottom: 30px;
+    }
+
+    .vip-button {
+      background-color: #d4af37;
+      padding: 20px 40px;
+      font-size: 22px;
+      border: none;
+      color: #111;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .vip-button:hover {
+      background-color: #b68c2b;
+    }
+
+    .image-container img {
+      max-width: 80%;
+      height: auto;
+      margin-top: 30px;
+      border-radius: 12px;
+      border: 2px solid #d4af37;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="welcome-container">
+    <h1>Welcome to Velvet Palace Casino</h1>
+    <p>Congratulations on becoming a VIP member! You have been granted an exclusive entrance to the most luxurious casino experience.</p>
+    
+    <div class="image-container">
+      <img src="frenchhelpxvelvetpalace.png" alt="French Help Velvet Palace" />
+    </div>
+
+    <button class="vip-button" onclick="enterCasino()">Enter the Casino</button>
+  </div>
+
+  <script>
+    function enterCasino() {
+      // Fade out text and simulate entry
+      document.querySelector('.welcome-container').innerHTML = "<p>Enjoy your stay in the Velvet Palace Casino! We're loading your VIP experience...</p>";
+      setTimeout(() => {
+        window.location.href = "home.html"; // Redirect to home page after 1 second
+      }, 1000);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fantasy Spin - Velvet Palace Casino</title>
+  <link rel="icon" href="favicon.ico" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap');
+
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(
+        #d4af37 0deg 45deg, 
+        #1f1f1f 45deg 90deg, 
+        #d4af37 90deg 135deg,
+        #1f1f1f 135deg 180deg, 
+        #d4af37 180deg 225deg,
+        #1f1f1f 225deg 270deg, 
+        #d4af37 270deg 315deg, 
+        #1f1f1f 315deg 360deg
+      );
+      border: 4px solid #d4af37;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+      position: absolute;
+      transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+    }
+
+    .center-circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60px;
+      height: 60px;
+      background-color: #111;
+      color: #d4af37;
+      border: 2px solid #d4af37;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
+      z-index: 10;
+    }
+
+    .slide-to-spin {
+      margin-top: 20px;
+      color: #d4af37;
+      font-size: 18px;
+      text-align: center;
+      animation: fade 1.5s infinite;
+    }
+
+    @keyframes fade {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .result-message {
+      color: #d4af37;
+      font-size: 18px;
+      margin-top: 20px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .mini-game {
+      margin-top: 20px;
+      color: #d4af37;
+      display: none;
+    }
+
+    .dice-roll-btn, .guess-btn, .pick-chest-btn, .unicorn-btn {
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #d4af37;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .dice-result, .guess-result, .chest-result, .unicorn-result {
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .memory-card {
+      width: 60px;
+      height: 60px;
+      margin: 10px;
+      background-color: #333;
+      display: inline-block;
+      cursor: pointer;
+      font-size: 24px;
+      color: transparent;
+      border: 2px solid #d4af37;
+      border-radius: 5px;
+      text-align: center;
+      line-height: 60px;
+    }
+
+    .memory-card.flipped {
+      color: #d4af37;
+    }
+
+    .guess-input {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 18px;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="wheel-container">
+  <div class="wheel" id="wheel"></div>
+  <div class="center-circle">🎯</div>
+</div>
+<div class="slide-to-spin">Slide to Spin!</div>
+<div class="result-message" id="resultMessage"></div>
+
+<!-- Mini Game Section -->
+<div class="mini-game" id="miniGame">
+  <div id="miniGameContent"></div>
+</div>
+
+<script>
+  let isDragging = false;
+  let startAngle = 0;
+  let currentAngle = 0;
+  let coinCount = localStorage.getItem('coinCount') ? parseInt(localStorage.getItem('coinCount')) : 1000;
+
+  const wheel = document.getElementById('wheel');
+  const resultMessage = document.getElementById('resultMessage');
+  const miniGame = document.getElementById('miniGame');
+  const miniGameContent = document.getElementById('miniGameContent');
+
+  // DRAGGING FUNCTIONALITY
+  wheel.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startAngle = getAngle(e.clientX, e.clientY);
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+      const angle = getAngle(e.clientX, e.clientY);
+      currentAngle += angle - startAngle;
+      startAngle = angle;
+      wheel.style.transform = `rotate(${currentAngle}deg)`;
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      spinWheel();
+    }
+  });
+
+  // CALCULATE ANGLE
+  function getAngle(x, y) {
+    const rect = wheel.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    return Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+  }
+
+  // SPINNING LOGIC
+  function spinWheel() {
+    if (coinCount < 100) {
+      showMessage('Not enough coins!');
+      return;
+    }
+
+    coinCount -= 100;
+    localStorage.setItem('coinCount', coinCount);
+
+    const spinAmount = Math.floor(3600 + Math.random() * 360);
+    wheel.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
+    wheel.style.transform = `rotate(${currentAngle + spinAmount}deg)`;
+
+    setTimeout(() => {
+      currentAngle += spinAmount;
+      checkOutcome(currentAngle % 360);
+    }, 4000);
+  }
+
+  // CHECK OUTCOME
+  function checkOutcome(angle) {
+    let result;
+    let reward = 0;
+
+    if (angle >= 0 && angle < 45) {
+      result = '🐉 Dragon’s Luck';
+      reward = 200;
+      startMiniGame('diceRoll');
+    } else if (angle >= 45 && angle < 90) {
+      result = '💰 Treasure Chest';
+      reward = 500;
+      startMiniGame('treasureChest');
+    } else if (angle >= 90 && angle < 135) {
+      result = '✨ Magic Spell';
+      reward = 300;
+      startMiniGame('magicSpell');
+    } else if (angle >= 135 && angle < 180) {
+      result = '🦄 Unicorn Bonus';
+      reward = 400;
+      startMiniGame('unicornRace');
+    } else if (angle >= 180 && angle < 225) {
+      result = '🔥 Phoenix Feather';
+      reward = 250;
+      startMiniGame('memoryGame');
+    } else if (angle >= 225 && angle < 270) {
+      result = '🌌 Galaxy Win';
+      reward = 600;
+      startMiniGame('guessNumber');
+    } else if (angle >= 270 && angle < 315) {
+      result = '🎰 Royal Jackpot';
+      reward = 1000;
+      startMiniGame('miniSlot');
+    } else {
+      result = '❌ No Win';
+    }
+
+    showMessage(`You won: ${result}`);
+    if (reward > 0) {
+      coinCount += reward;
+      localStorage.setItem('coinCount', coinCount);
+      showMessage(`You earned ${reward} coins!`);
+    }
+  }
+
+  // DISPLAY RESULT MESSAGE
+  function showMessage(message) {
+    resultMessage.textContent = message;
+    resultMessage.style.opacity = 1;
+    setTimeout(() => {
+      resultMessage.style.opacity = 0;
+    }, 3000);
+  }
+
+  // MINI-GAME FUNCTIONS
+  function startMiniGame(game) {
+    miniGame.style.display = 'block';
+    switch (game) {
+      case 'diceRoll':
+        miniGameContent.innerHTML = `
+          <button class="dice-roll-btn" onclick="rollDice()">Roll the Dice</button>
+          <div class="dice-result" id="diceResult"></div>
+        `;
+        break;
+      case 'treasureChest':
+        miniGameContent.innerHTML = `
+          <button class="pick-chest-btn" onclick="pickChest()">Pick a Chest</button>
+          <div class="chest-result" id="chestResult"></div>
+        `;
+        break;
+      case 'magicSpell':
+        miniGameContent.innerHTML = `
+          <button class="guess-btn" onclick="guessPotion()">Guess the Potion</button>
+          <input type="text" id="potionInput" class="guess-input" placeholder="Enter potion number (1-5)">
+          <div class="guess-result" id="guessResult"></div>
+        `;
+        break;
+      case 'unicornRace':
+        miniGameContent.innerHTML = `
+          <button class="unicorn-btn" onclick="race()">Race</button>
+          <div class="unicorn-result" id="unicornResult"></div>
+        `;
+        break;
+      case 'memoryGame':
+        miniGameContent.innerHTML = `
+          <div id="memoryCards" class="memory-cards"></div>
+        `;
+        startMemoryGame();
+        break;
+      case 'guessNumber':
+        miniGameContent.innerHTML = `
+          <input type="number" id="numberInput" class="guess-input" placeholder="Guess a number (1-10)">
+          <button class="guess-btn" onclick="guessNumber()">Guess</button>
+          <div class="guess-result" id="numberResult"></div>
+        `;
+        break;
+      case 'miniSlot':
+        miniGameContent.innerHTML = `
+          <button class="dice-roll-btn" onclick="miniSlot()">Spin the Slot</button>
+          <div class="dice-result" id="slotResult"></div>
+        `;
+        break;
+    }
+  }
+
+  // Mini-Game Implementations
+  function rollDice() {
+    const diceRoll = Math.floor(Math.random() * 6) + 1;
+    const resultDiv = document.getElementById('diceResult');
+    if (diceRoll >= 4) {
+      resultDiv.textContent = `You rolled a ${diceRoll}. You win!`;
+      coinCount += 200;
+      localStorage.setItem('coinCount', coinCount);
+    } else {
+      resultDiv.textContent = `You rolled a ${diceRoll}. You lose!`;
+    }
+  }
+
+  function pickChest() {
+    const chest = Math.random() > 0.5 ? 'Gold' : 'Silver';
+    const resultDiv = document.getElementById('chestResult');
+    if (chest === 'Gold') {
+      resultDiv.textContent = 'You picked the Gold Chest! You win 500 coins!';
+      coinCount += 500;
+    } else {
+      resultDiv.textContent = 'You picked the Silver Chest. You win 100 coins!';
+      coinCount += 100;
+    }
+    localStorage.setItem('coinCount', coinCount);
+  }
+
+  function guessPotion() {
+    const correctPotion = Math.floor(Math.random() * 5) + 1;
+    const guess = parseInt(document.getElementById('potionInput').value);
+    const resultDiv = document.getElementById('guessResult');
+    if (guess === correctPotion) {
+      resultDiv.textContent = `You guessed correctly! Potion #${correctPotion}. You win 300 coins!`;
+      coinCount += 300;
+    } else {
+      resultDiv.textContent = `Wrong! The correct potion was #${correctPotion}.`;
+    }
+    localStorage.setItem('coinCount', coinCount);
+  }
+
+  function race() {
+    const winner = Math.random() > 0.5 ? 'Unicorn' : 'Dragon';
+    const resultDiv = document.getElementById('unicornResult');
+    if (winner === 'Unicorn') {
+      resultDiv.textContent = `The Unicorn won! You win 400 coins!`;
+      coinCount += 400;
+    } else {
+      resultDiv.textContent = `The Dragon won! You lose!`;
+    }
+    localStorage.setItem('coinCount', coinCount);
+  }
+
+  function startMemoryGame() {
+    const cards = ['A', 'B', 'C', 'D', 'E', 'F', 'A', 'B', 'C', 'D', 'E', 'F'];
+    cards.sort(() => Math.random() - 0.5);
+
+    const cardsContainer = document.getElementById('memoryCards');
+    cards.forEach((card, index) => {
+      const cardElement = document.createElement('div');
+      cardElement.classList.add('memory-card');
+      cardElement.setAttribute('data-id', index);
+      cardElement.textContent = card;
+      cardElement.addEventListener('click', flipCard);
+      cardsContainer.appendChild(cardElement);
+    });
+  }
+
+  let flippedCards = [];
+  function flipCard(e) {
+    const card = e.target;
+    card.classList.add('flipped');
+    if (flippedCards.length === 2) return;
+
+    flippedCards.push(card);
+    if (flippedCards.length === 2) {
+      setTimeout(() => {
+        if (flippedCards[0].textContent === flippedCards[1].textContent) {
+          coinCount += 500;
+          localStorage.setItem('coinCount', coinCount);
+          showMessage('You matched cards! You win 500 coins!');
+        }
+        flippedCards.forEach((card) => card.classList.remove('flipped'));
+        flippedCards = [];
+      }, 1000);
+    }
+  }
+
+  function guessNumber() {
+    const correctNumber = Math.floor(Math.random() * 10) + 1;
+    const guess = parseInt(document.getElementById('numberInput').value);
+    const resultDiv = document.getElementById('numberResult');
+    if (guess === correctNumber) {
+      resultDiv.textContent = `You guessed correctly! You win 600 coins!`;
+      coinCount += 600;
+    } else {
+      resultDiv.textContent = `Wrong! The correct number was ${correctNumber}.`;
+    }
+    localStorage.setItem('coinCount', coinCount);
+  }
+
+  function miniSlot() {
+    const slotResult = Math.random() > 0.5 ? 'Jackpot' : 'Try Again';
+    const resultDiv = document.getElementById('slotResult');
+    if (slotResult === 'Jackpot') {
+      resultDiv.textContent = 'You hit the jackpot! You win 1000 coins!';
+      coinCount += 1000;
+    } else {
+      resultDiv.textContent = 'Try again next time!';
+    }
+    localStorage.setItem('coinCount', coinCount);
+  }
+</script>
+
+</body>
+</html>

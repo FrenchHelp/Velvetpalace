@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velvet Palace Casino - Rewards</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #111;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .nav-links a {
+      color: #d4af37;
+      text-decoration: none;
+      padding: 12px 24px;
+      display: inline-block;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 8px 20px;
+      border-radius: 30px;
+      color: #d4af37;
+      font-size: 18px;
+      border: 1px solid #d4af37;
+    }
+
+    .rewards-container {
+      padding: 40px;
+      text-align: center;
+    }
+
+    .rewards-container h2 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: #d4af37;
+    }
+
+    .reward {
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 10px;
+      border: 2px solid #d4af37;
+      display: inline-block;
+      cursor: pointer;
+      width: 200px;
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+
+    .reward:hover {
+      background-color: #d4af37;
+      color: #111;
+    }
+
+    .reward span {
+      font-size: 40px;
+      display: block;
+    }
+
+    .reward p {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    .reward button {
+      background-color: #d4af37;
+      border: none;
+      color: #111;
+      font-size: 18px;
+      padding: 10px 20px;
+      margin-top: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .reward button:hover {
+      background-color: #fff;
+      color: #d4af37;
+    }
+
+    .reward button:disabled {
+      background-color: #555;
+      color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .notification {
+      font-size: 18px;
+      color: #d4af37;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #111;
+      border-radius: 8px;
+      display: inline-block;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="games.html">Games</a>
+      <a href="shop.html">Shop</a>
+      <a href="rewards.html">Rewards</a>
+    </div>
+    <div class="coin-counter">Coins: <span id="coinCount">1000</span></div>
+  </div>
+
+  <div class="rewards-container">
+    <h2>Velvet Palace Rewards</h2>
+    <div class="reward" id="free-spins">
+      <span>🎁</span>
+      <p>Free Spins</p>
+      <p>Chance to win up to 200 coins</p>
+      <button onclick="redeemReward('free-spins')" id="free-spins-btn">Redeem</button>
+    </div>
+
+    <div class="reward" id="vip-entry">
+      <span>🎁</span>
+      <p>VIP Entry</p>
+      <p>Win 200 coins or lose 50 coins</p>
+      <button onclick="redeemReward('vip-entry')" id="vip-entry-btn">Redeem</button>
+    </div>
+
+    <div class="reward" id="cashback">
+      <span>🎁</span>
+      <p>Cashback Offer</p>
+      <p>Chance to get 1.5x your bet or lose 1.5x</p>
+      <button onclick="redeemReward('cashback')" id="cashback-btn">Redeem</button>
+    </div>
+
+    <div class="reward" id="high-risk">
+      <span>🎁</span>
+      <p>High Risk, High Reward</p>
+      <p>Win 500 coins or lose 200 coins</p>
+      <button onclick="redeemReward('high-risk')" id="high-risk-btn">Redeem</button>
+    </div>
+
+    <div id="notification"></div>
+  </div>
+
+  <script>
+    // Retrieve coin count from local storage, default to 1000 if not found
+    let coinCount = localStorage.getItem('coinCount') ? parseInt(localStorage.getItem('coinCount')) : 1000;
+    document.getElementById('coinCount').textContent = coinCount;
+
+    // Update coin count in local storage whenever it changes
+    function updateCoinCount(newAmount) {
+      coinCount = newAmount;
+      localStorage.setItem('coinCount', coinCount);
+      document.getElementById('coinCount').textContent = coinCount;
+    }
+
+    // Rewards logic
+    function redeemReward(rewardType) {
+      let notificationMessage = '';
+      let rewardValue = 0;
+      let buttonId = '';
+
+      switch(rewardType) {
+        case 'free-spins':
+          rewardValue = Math.floor(Math.random() * 200); // Up to 200 coins
+          notificationMessage = `You won ${rewardValue} coins from Free Spins!`;
+          buttonId = 'free-spins-btn';
+          break;
+        case 'vip-entry':
+          if (Math.random() < 0.5) {
+            rewardValue = 200; // Win 200 coins
+            notificationMessage = `You won ${rewardValue} coins from VIP Entry!`;
+          } else {
+            rewardValue = -50; // Lose 50 coins
+            notificationMessage = `You lost 50 coins from VIP Entry.`;
+          }
+          buttonId = 'vip-entry-btn';
+          break;
+        case 'cashback':
+          if (Math.random() < 0.5) {
+            rewardValue = Math.floor(1.5 * coinCount); // Win 1.5x bet
+            notificationMessage = `You won ${rewardValue} coins from Cashback!`;
+          } else {
+            rewardValue = Math.floor(1.5 * coinCount); // Lose 1.5x bet
+            notificationMessage = `You lost ${rewardValue} coins from Cashback.`;
+          }
+          buttonId = 'cashback-btn';
+          break;
+        case 'high-risk':
+          if (Math.random() < 0.5) {
+            rewardValue = 500; // Win 500 coins
+            notificationMessage = `You won ${rewardValue} coins from High Risk, High Reward!`;
+          } else {
+            rewardValue = -200; // Lose 200 coins
+            notificationMessage = `You lost 200 coins from High Risk, High Reward.`;
+          }
+          buttonId = 'high-risk-btn';
+          break;
+        default:
+          notificationMessage = `Invalid reward type.`;
+      }
+
+      // Update the coin count
+      updateCoinCount(coinCount + rewardValue);
+
+      // Show notification for 1 second
+      let notificationElement = document.getElementById('notification');
+      notificationElement.textContent = notificationMessage;
+      setTimeout(() => {
+        notificationElement.textContent = '';
+      }, 1000);
+
+      // Disable the button after redeeming the reward
+      document.getElementById(buttonId).disabled = true;
+    }
+  </script>
+</body>
+</html>

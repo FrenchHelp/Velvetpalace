@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slots - Velvet Palace Casino</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap');
+
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #111;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .nav-links a {
+      color: #d4af37;
+      text-decoration: none;
+      padding: 12px 24px;
+      display: inline-block;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 8px 20px;
+      border-radius: 30px;
+      color: #d4af37;
+      font-size: 18px;
+      border: 1px solid #d4af37;
+    }
+
+    .slot-container {
+      margin-top: 100px;
+      padding: 50px;
+      background-color: #111;
+      border-radius: 12px;
+      border: 2px solid #d4af37;
+      display: inline-block;
+    }
+
+    .slot-machine {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 30px;
+    }
+
+    .slot {
+      width: 100px;
+      height: 100px;
+      background-color: #1f1f1f;
+      color: #d4af37;
+      font-size: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 8px;
+      border: 2px solid #d4af37;
+    }
+
+    .spin-button {
+      background-color: #d4af37;
+      padding: 20px 40px;
+      font-size: 22px;
+      border: none;
+      color: #111;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .spin-button:hover {
+      background-color: #b68c2b;
+    }
+
+    .message {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #d4af37;
+    }
+
+    .cost-info {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="games.html">Games</a>
+      <a href="shop.html">Shop</a>
+      <a href="rewards.html">Rewards</a>
+    </div>
+    <div class="coin-counter">Coins: <span id="coinCount">5000</span></div>
+  </div>
+
+  <div class="slot-container">
+    <h1>Slots Game</h1>
+    <p class="cost-info">Cost to play: <strong>50 Coins</strong></p>
+    <div class="slot-machine">
+      <div class="slot" id="slot1">🍒</div>
+      <div class="slot" id="slot2">🍋</div>
+      <div class="slot" id="slot3">🍊</div>
+      <div class="slot" id="slot4">🍉</div>
+      <div class="slot" id="slot5">🍇</div>
+    </div>
+    <button class="spin-button" onclick="spinSlots()">Spin</button>
+    <div class="message" id="message">Spin the slots and win coins!</div>
+  </div>
+
+  <script>
+    // Initialize coin count and display
+    if (!localStorage.getItem('coinCount')) {
+      localStorage.setItem('coinCount', '5000');
+    }
+    let coinCount = parseInt(localStorage.getItem('coinCount'));
+    document.getElementById('coinCount').textContent = coinCount;
+
+    const slotSymbols = ['🍒', '🍋', '🍊', '🍉', '🍇', '💎'];
+    
+    function spinSlots() {
+      // Ensure the player has enough coins
+      if (coinCount < 50) {
+        document.getElementById('message').textContent = 'Not enough coins to play!';
+        setTimeout(() => {
+          document.getElementById('message').textContent = '';
+        }, 1000);
+        return;
+      }
+
+      // Deduct 50 coins to play
+      coinCount -= 50;
+      localStorage.setItem('coinCount', coinCount);
+      document.getElementById('coinCount').textContent = coinCount;
+
+      // Disable the spin button temporarily
+      document.querySelector('.spin-button').disabled = true;
+
+      // Start fast-changing slots
+      let interval = setInterval(() => {
+        document.getElementById('slot1').textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+        document.getElementById('slot2').textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+        document.getElementById('slot3').textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+        document.getElementById('slot4').textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+        document.getElementById('slot5').textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+      }, 50);
+
+      // Stop the fast change after 1 second and check the results
+      setTimeout(() => {
+        clearInterval(interval);
+        const results = [
+          document.getElementById('slot1').textContent,
+          document.getElementById('slot2').textContent,
+          document.getElementById('slot3').textContent,
+          document.getElementById('slot4').textContent,
+          document.getElementById('slot5').textContent
+        ];
+        
+        // Check for matching symbols
+        const symbolCount = {};
+        results.forEach(symbol => {
+          symbolCount[symbol] = (symbolCount[symbol] || 0) + 1;
+        });
+
+        let winAmount = 0;
+        let message = 'Try again!';
+
+        // Calculate win based on the number of matching symbols
+        Object.values(symbolCount).forEach(count => {
+          if (count === 2) winAmount = Math.max(winAmount, 40);  // 2 same: 40 coins
+          if (count === 3) winAmount = Math.max(winAmount, 60);  // 3 same: 120% of 50
+          if (count === 4) winAmount = Math.max(winAmount, 100); // 4 same: 200% of 50
+          if (count === 5) winAmount = Math.max(winAmount, 250); // 5 same: 500% of 50
+        });
+
+        // Check for all diamonds (💎)
+        if (results.every(symbol => symbol === '💎')) {
+          winAmount = Math.max(winAmount, 10000); // 10,000 coins for all diamonds
+        }
+
+        // Check if 2 of the same twice
+        if (symbolCount[results[0]] >= 2 && symbolCount[results[1]] >= 2) {
+          winAmount = Math.max(winAmount, 37.5); // 75% of 50 for two sets of 2 matching
+        }
+
+        // Update coins and message if there was a win
+        if (winAmount > 0) {
+          coinCount += winAmount;
+          localStorage.setItem('coinCount', coinCount);
+          document.getElementById('coinCount').textContent = coinCount;
+          message = `You win ${winAmount} coins!`;
+        }
+
+        // Update the message
+        document.getElementById('message').textContent = message;
+
+        // Re-enable the button after 1 second
+        setTimeout(() => {
+          document.querySelector('.spin-button').disabled = false;
+        }, 1000);
+
+        // Hide the message after 1 second
+        setTimeout(() => {
+          document.getElementById('message').textContent = '';
+        }, 1000);
+
+      }, 1000); // Stop changing after 1 second
+    }
+  </script>
+
+</body>
+</html>
