@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Velvet Palace Casino - Rewards</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: #111;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .menu-toggle {
+      font-size: 28px;
+      color: #d4af37;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .nav-menu {
+      display: none;
+      flex-direction: column;
+      background-color: #111;
+      position: absolute;
+      top: 50px;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+    }
+
+    .nav-menu a {
+      padding: 12px;
+      border-top: 1px solid #d4af37;
+      text-align: center;
+      color: #d4af37;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    .nav-menu a:hover {
+      background-color: #222;
+    }
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid #d4af37;
+      font-size: 14px;
+    }
+
+    .rewards-container {
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .rewards-container h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #d4af37;
+    }
+
+    .reward {
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 12px auto;
+      border: 2px solid #d4af37;
+      width: 85%;
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+
+    .reward:hover {
+      background-color: #d4af37;
+      color: #111;
+    }
+
+    .reward span {
+      font-size: 32px;
+      display: block;
+    }
+
+    .reward p {
+      margin-top: 8px;
+      font-size: 16px;
+    }
+
+    .reward button {
+      background-color: #d4af37;
+      border: none;
+      color: #111;
+      font-size: 16px;
+      padding: 8px 16px;
+      margin-top: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .reward button:hover {
+      background-color: #fff;
+      color: #d4af37;
+    }
+
+    .reward button:disabled {
+      background-color: #555;
+      color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .notification {
+      font-size: 16px;
+      color: #d4af37;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #111;
+      border-radius: 8px;
+    }
+
+    .audio-toggle {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background-color: #d4af37;
+      color: #0a0a0a;
+      border: none;
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 99;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="coin-counter">Coins: <span id="coinCount">1000</span></div>
+    <div class="nav-menu" id="navMenu">
+      <a href="mobile.html">Home</a>
+      <a href="games-mobile.html">Games</a>
+      <a href="shop-mobile.html">Shop</a>
+      <a href="rewards-mobile.html">Rewards</a>
+    </div>
+  </div>
+
+  <div class="rewards-container">
+    <h2>Velvet Palace Rewards</h2>
+
+    <div class="reward" id="free-spins">
+      <span>🎁</span>
+      <p>Free Spins</p>
+      <p>Chance to win up to 200 coins</p>
+      <button onclick="redeemReward('free-spins')" id="free-spins-btn">Redeem</button>
+    </div>
+
+    <div class="reward" id="vip-entry">
+      <span>🎁</span>
+      <p>VIP Entry</p>
+      <p>Win 200 coins or lose 50 coins</p>
+      <button onclick="redeemReward('vip-entry')" id="vip-entry-btn">Redeem</button>
+    </div>
+
+    <div class="reward" id="cashback">
+      <span>🎁</span>
+      <p>Cashback Offer</p>
+      <p>Chance to get 1.5x your bet or lose 1.5x</p>
+      <button onclick="redeemReward('cashback')" id="cashback-btn">Redeem</button>
+    </div>
+
+    <div class="reward" id="high-risk">
+      <span>🎁</span>
+      <p>High Risk, High Reward</p>
+      <p>Win 500 coins or lose 200 coins</p>
+      <button onclick="redeemReward('high-risk')" id="high-risk-btn">Redeem</button>
+    </div>
+
+    <div class="notification" id="notification"></div>
+  </div>
+
+  <audio id="bgMusic" loop>
+    <source src="bg-music.mp3" type="audio/mp3" />
+  </audio>
+  <button class="audio-toggle" onclick="toggleAudio()">🔇 Sound</button>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("navMenu");
+      menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    }
+
+    let coinCount = localStorage.getItem('coinCount') ? parseInt(localStorage.getItem('coinCount')) : 1000;
+    document.getElementById('coinCount').textContent = coinCount;
+
+    function updateCoinCount(newAmount) {
+      coinCount = newAmount;
+      localStorage.setItem('coinCount', coinCount);
+      document.getElementById('coinCount').textContent = coinCount;
+    }
+
+    function redeemReward(rewardType) {
+      let notificationMessage = '';
+      let rewardValue = 0;
+      let buttonId = '';
+
+      switch (rewardType) {
+        case 'free-spins':
+          rewardValue = Math.floor(Math.random() * 200);
+          notificationMessage = `🎉 You won ${rewardValue} coins from Free Spins!`;
+          buttonId = 'free-spins-btn';
+          break;
+        case 'vip-entry':
+          if (Math.random() < 0.5) {
+            rewardValue = 200;
+            notificationMessage = `🎉 You won ${rewardValue} coins from VIP Entry!`;
+          } else {
+            rewardValue = -50;
+            notificationMessage = `😢 You lost 50 coins from VIP Entry.`;
+          }
+          buttonId = 'vip-entry-btn';
+          break;
+        case 'cashback':
+          rewardValue = Math.floor(1.5 * coinCount);
+          if (Math.random() < 0.5) {
+            notificationMessage = `🎉 You won ${rewardValue} coins from Cashback!`;
+          } else {
+            rewardValue = -rewardValue;
+            notificationMessage = `😢 You lost ${-rewardValue} coins from Cashback.`;
+          }
+          buttonId = 'cashback-btn';
+          break;
+        case 'high-risk':
+          if (Math.random() < 0.5) {
+            rewardValue = 500;
+            notificationMessage = `🎉 You won ${rewardValue} coins from High Risk!`;
+          } else {
+            rewardValue = -200;
+            notificationMessage = `😢 You lost 200 coins from High Risk.`;
+          }
+          buttonId = 'high-risk-btn';
+          break;
+      }
+
+      updateCoinCount(coinCount + rewardValue);
+      const notification = document.getElementById('notification');
+      notification.textContent = notificationMessage;
+
+      setTimeout(() => {
+        notification.textContent = '';
+      }, 2000);
+
+      document.getElementById(buttonId).disabled = true;
+    }
+
+    // Audio logic
+    let musicPlaying = false;
+    const music = document.getElementById("bgMusic");
+    const audioBtn = document.querySelector(".audio-toggle");
+
+    function toggleAudio() {
+      if (musicPlaying) {
+        music.pause();
+        audioBtn.textContent = "🔇 Sound";
+      } else {
+        music.play();
+        audioBtn.textContent = "🔊 Sound";
+      }
+      musicPlaying = !musicPlaying;
+    }
+
+    window.addEventListener('click', function initMusic() {
+      music.play().catch(() => {});
+      musicPlaying = true;
+      audioBtn.textContent = "🔊 Sound";
+      window.removeEventListener('click', initMusic);
+    });
+  </script>
+</body>
+</html>
