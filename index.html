@@ -78,6 +78,13 @@
       animation: fadeOut 1s ease forwards;
     }
   </style>
+
+  <script>
+    // Redirect mobile users
+    if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      window.location.href = "mobile.html"; // Change this to the actual mobile page
+    }
+  </script>
 </head>
 <body>
 
@@ -88,14 +95,12 @@
 
 <script>
   function fadeOutAndRedirect() {
-    // Apply the fade-out animation to the title and button
     document.getElementById('enterTitle').classList.add('fade-out');
     document.getElementById('enterButton').classList.add('fade-out');
 
-    // Redirect to the home page after animation completes
     setTimeout(function() {
       window.location.href = 'home.html';
-    }, 1000); // Wait 1 second for the fade-out effect
+    }, 1000);
   }
 </script>
 
