@@ -49,6 +49,21 @@
   <div class="casino-icon">🎰</div>
   <h1>404</h1>
   <p>Looks like you rolled a blank! This page doesn’t exist.</p>
-  <a href="home.html">Return to the Casino Floor</a>
+  <a id="redirectButton" href="#">Return to the Casino Floor</a>
+
+  <script>
+    // Function to detect if the user is on a mobile device
+    function isMobileDevice() {
+      return window.innerWidth <= 768; // You can adjust the width threshold if needed
+    }
+
+    // Redirect based on device type
+    const redirectButton = document.getElementById("redirectButton");
+    if (isMobileDevice()) {
+      redirectButton.href = "mobile.html"; // Redirect mobile users to mobile.html
+    } else {
+      redirectButton.href = "home.html"; // Redirect desktop users to home.html
+    }
+  </script>
 </body>
 </html>
