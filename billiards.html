@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Billiards - Velvet Palace Casino</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #111;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .nav-links a {
+      color: #d4af37;
+      text-decoration: none;
+      padding: 12px 24px;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 8px 20px;
+      border-radius: 30px;
+      border: 1px solid #d4af37;
+      font-size: 18px;
+    }
+
+    .game-container {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .game-title {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    canvas {
+      border: 3px solid #d4af37;
+      background-color: #006400;
+      box-shadow: 0 0 10px #d4af37;
+    }
+
+    .button-container {
+      margin-top: 20px;
+    }
+
+    .spin-button {
+      padding: 15px 40px;
+      font-size: 20px;
+      background-color: #d4af37;
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .spin-button:hover {
+      background-color: #fff;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 24px;
+      min-height: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="games.html">Games</a>
+      <a href="shop.html">Shop</a>
+      <a href="rewards.html">Rewards</a>
+    </div>
+    <div class="coin-counter">Coins: <span id="coinCount">1000</span></div>
+  </div>
+
+  <div class="game-container">
+    <h1 class="game-title">🎱 Billiards</h1>
+
+    <canvas id="poolTable" width="800" height="400"></canvas>
+
+    <div class="button-container">
+      <button class="spin-button" onclick="startGame()">Play (100 coins)</button>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    let coinCount = localStorage.getItem('coinCount') ? parseInt(localStorage.getItem('coinCount')) : 1000;
+    document.getElementById('coinCount').textContent = coinCount;
+
+    const canvas = document.getElementById("poolTable");
+    const ctx = canvas.getContext("2d");
+    const balls = [];
+    let isPlaying = false;
+    const ballRadius = 15;
+    const pockets = [
+      { x: 0, y: 0 }, { x: 400, y: 0 }, { x: 800, y: 0 }, // top pockets
+      { x: 0, y: 400 }, { x: 400, y: 400 }, { x: 800, y: 400 } // bottom pockets
+    ];
+
+    // Ball object with position, velocity, and a color
+    class Ball {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.velocityX = 0;
+        this.velocityY = 0;
+      }
+
+      // Draw the ball on the canvas
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, ballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.closePath();
+      }
+
+      // Update ball position based on its velocity
+      update() {
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+
+        // Ball-to-wall collisions (table edges)
+        if (this.x - ballRadius < 0 || this.x + ballRadius > canvas.width) {
+          this.velocityX = -this.velocityX;
+        }
+
+        if (this.y - ballRadius < 0 || this.y + ballRadius > canvas.height) {
+          this.velocityY = -this.velocityY;
+        }
+      }
+
+      // Detect if the ball is in a pocket (check proximity)
+      isInPocket() {
+        for (let pocket of pockets) {
+          let distance = Math.sqrt(Math.pow(this.x - pocket.x, 2) + Math.pow(this.y - pocket.y, 2));
+          if (distance < ballRadius) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      // Reset ball position
+      reset() {
+        this.x = canvas.width / 2;
+        this.y = canvas.height / 2;
+        this.velocityX = 0;
+        this.velocityY = 0;
+      }
+    }
+
+    // Initialize balls (cue ball + 3 colored balls)
+    function initializeBalls() {
+      balls.length = 0;
+      balls.push(new Ball(canvas.width / 2, canvas.height / 2, "white")); // Cue ball
+      balls.push(new Ball(200, 200, "red"));
+      balls.push(new Ball(300, 250, "blue"));
+      balls.push(new Ball(400, 300, "green"));
+    }
+
+    // Start the game (bet 100 coins, reset game state)
+    function startGame() {
+      if (coinCount < 100) {
+        document.getElementById("result").textContent = "Not enough coins!";
+        return;
+      }
+
+      isPlaying = true;
+      updateCoinCount(coinCount - 100);
+      initializeBalls();
+      document.getElementById("result").textContent = "Game Started! Clear all balls in 5 shots.";
+      requestAnimationFrame(updateGame);
+    }
+
+    // Update the game: animate balls and check game status
+    function updateGame() {
+      if (!isPlaying) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw the balls and update their positions
+      balls.forEach(ball => {
+        ball.update();
+        ball.draw();
+      });
+
+      // Check if all balls are in pockets
+      let clearedBalls = balls.filter(ball => ball.isInPocket()).length - 1; // Exclude cue ball
+      if (clearedBalls === 3) {
+        isPlaying = false;
+        updateCoinCount(coinCount + 300);
+        document.getElementById("result").textContent = "You cleared all the balls! You won 300 coins!";
+        return;
+      }
+
+      // If shots are over, end game
+      let shotsLeft = 5 - clearedBalls;
+      if (shotsLeft <= 0) {
+        isPlaying = false;
+        document.getElementById("result").textContent = "You failed to clear all balls. Game Over!";
+      } else {
+        document.getElementById("result").textContent = `Shots left: ${shotsLeft}`;
+      }
+
+      requestAnimationFrame(updateGame);
+    }
+
+    // Update the coin count and store it
+    function updateCoinCount(newAmount) {
+      coinCount = newAmount;
+      localStorage.setItem('coinCount', coinCount);
+      document.getElementById('coinCount').textContent = coinCount;
+    }
+  </script>
+</body>
+</html>
