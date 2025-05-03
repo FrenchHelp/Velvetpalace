@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blackjack | Velvet Palace</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background-color: #111;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .hamburger {
+      font-size: 24px;
+      cursor: pointer;
+      color: #d4af37;
+    }
+
+   .mobile-menu {
+  display: none;
+  flex-direction: column;
+  background-color: #111;
+  position: absolute;
+  top: 56px;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  border-top: 2px solid #d4af37;
+}
+
+.mobile-menu a {
+  padding: 12px;
+  border-top: 1px solid #d4af37;
+  text-align: center;
+  color: #d4af37;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.mobile-menu a:hover {
+  background-color: #222;
+}
+
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 16px;
+      border: 1px solid #d4af37;
+    }
+
+    h1 {
+      font-size: 32px;
+      text-align: center;
+      margin: 20px 0 10px;
+    }
+
+    .cards {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      font-size: 24px;
+      background: #1f1f1f;
+      padding: 16px;
+      border: 2px solid #d4af37;
+      border-radius: 8px;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px;
+    }
+
+    button {
+      background-color: #d4af37;
+      color: #0a0a0a;
+      font-size: 16px;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #fff;
+    }
+
+    .status {
+      font-size: 18px;
+      text-align: center;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="coin-counter">Coins: <span id="coinCount">1000</span></div>
+  </div>
+  <div class="mobile-menu" id="menu">
+    <a href="mobile.html">Home</a>
+    <a href="shop-mobile.html">Shop</a>
+    <a href="rewards-mobile.html">Rewards</a>
+  </div>
+
+  <h1>🃏 Blackjack</h1>
+  <h2 style="text-align:center;">Your Hand (<span id="playerTotal">0</span>):</h2>
+  <div id="playerCards" class="cards"></div>
+
+  <h2 style="text-align:center;">Dealer's Hand (<span id="dealerTotal">0</span>):</h2>
+  <div id="dealerCards" class="cards"></div>
+
+  <div class="buttons">
+    <button onclick="hit()">Hit</button>
+    <button onclick="stand()">Stand</button>
+    <button onclick="resetGame()">Reset</button>
+  </div>
+
+  <div class="status" id="statusText">Place your bet and draw a card!</div>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("menu");
+      menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    }
+
+    let coinCount = localStorage.getItem('coinCount') ? parseInt(localStorage.getItem('coinCount')) : 1000;
+    document.getElementById('coinCount').textContent = coinCount;
+
+    function updateCoinCount(newAmount) {
+      coinCount = newAmount;
+      localStorage.setItem('coinCount', coinCount);
+      document.getElementById('coinCount').textContent = coinCount;
+    }
+
+    const BET_AMOUNT = 100;
+
+    const suits = ["♠", "♥", "♦", "♣"];
+    const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+
+    let deck = [];
+    let playerHand = [];
+    let dealerHand = [];
+    let gameOver = false;
+    let playerStand = false;
+
+    function createDeck() {
+      deck = [];
+      for (let suit of suits) {
+        for (let value of values) {
+          deck.push({ suit, value });
+        }
+      }
+      deck.sort(() => Math.random() - 0.5);
+    }
+
+    function getCardValue(card) {
+      if (["J", "Q", "K"].includes(card.value)) return 10;
+      if (card.value === "A") return 11;
+      return parseInt(card.value);
+    }
+
+    function calculateTotal(hand) {
+      let total = 0;
+      let aces = 0;
+
+      for (let card of hand) {
+        total += getCardValue(card);
+        if (card.value === "A") aces++;
+      }
+
+      while (total > 21 && aces > 0) {
+        total -= 10;
+        aces--;
+      }
+
+      return total;
+    }
+
+    function dealCard(hand, elementId) {
+      const card = deck.pop();
+      hand.push(card);
+      const cardDiv = document.createElement("div");
+      cardDiv.className = "card";
+      cardDiv.textContent = `${card.value}${card.suit}`;
+      document.getElementById(elementId).appendChild(cardDiv);
+    }
+
+    function hit() {
+      if (gameOver || playerStand) return;
+      dealCard(playerHand, "playerCards");
+      updateTotals();
+
+      if (calculateTotal(playerHand) > 21) {
+        endGame("You bust! 💥 Dealer wins.", "loss");
+      }
+    }
+
+    function stand() {
+      if (gameOver) return;
+      playerStand = true;
+
+      while (calculateTotal(dealerHand) < 17) {
+        dealCard(dealerHand, "dealerCards");
+      }
+
+      updateTotals();
+      const playerScore = calculateTotal(playerHand);
+      const dealerScore = calculateTotal(dealerHand);
+
+      if (dealerScore > 21) {
+        endGame("Dealer busts! 🎉 You win!", "win");
+      } else if (dealerScore > playerScore) {
+        endGame("Dealer wins. 😢", "loss");
+      } else if (dealerScore < playerScore) {
+        endGame("You win! 🎉", "win");
+      } else {
+        endGame("It's a tie. 🤝", "tie");
+      }
+    }
+
+    function resetGame() {
+      if (coinCount < BET_AMOUNT) {
+        document.getElementById("statusText").textContent = "Not enough coins to play.";
+        return;
+      }
+
+      updateCoinCount(coinCount - BET_AMOUNT);
+
+      gameOver = false;
+      playerStand = false;
+      playerHand = [];
+      dealerHand = [];
+      createDeck();
+      document.getElementById("playerCards").innerHTML = "";
+      document.getElementById("dealerCards").innerHTML = "";
+      document.getElementById("statusText").textContent = "New round started!";
+
+      dealCard(playerHand, "playerCards");
+      dealCard(playerHand, "playerCards");
+      dealCard(dealerHand, "dealerCards");
+      updateTotals();
+    }
+
+    function updateTotals() {
+      document.getElementById("playerTotal").textContent = calculateTotal(playerHand);
+      document.getElementById("dealerTotal").textContent = calculateTotal(dealerHand);
+    }
+
+    function endGame(message, outcome) {
+      gameOver = true;
+      document.getElementById("statusText").textContent = message;
+
+      if (outcome === "win") {
+        updateCoinCount(coinCount + BET_AMOUNT * 2);
+      } else if (outcome === "tie") {
+        updateCoinCount(coinCount + BET_AMOUNT);
+      }
+    }
+
+    window.onload = resetGame;
+  </script>
+</body>
+</html>
