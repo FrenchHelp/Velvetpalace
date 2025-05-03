@@ -103,11 +103,24 @@
 
   <audio id="bgMusic" src="bg-music.mp3" autoplay loop></audio>
   <script>
-    // Ensure music auto-plays on user interaction
-    document.body.addEventListener('click', function () {
-      const music = document.getElementById('bgMusic');
-      if (music.paused) music.play();
-    }, { once: true });
-  </script>
+  function isMobileDevice() {
+    return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  function fadeOutAndRedirect() {
+    // Apply the fade-out animation to the title and button
+    document.getElementById('enterTitle').classList.add('fade-out');
+    document.getElementById('enterButton').classList.add('fade-out');
+
+    // Redirect based on device type
+    setTimeout(function() {
+      if (isMobileDevice()) {
+        window.location.href = 'mobile.html';
+      } else {
+        window.location.href = 'home.html';
+      }
+    }, 1000); // Wait 1 second for the fade-out effect
+  }
+</script>
 </body>
 </html>
