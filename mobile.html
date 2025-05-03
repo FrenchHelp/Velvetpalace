@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velvet Palace Casino - Mobile</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .navbar {
+      background-color: #111;
+      padding: 15px;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .navbar a {
+      color: #d4af37;
+      margin: 0 10px;
+      text-decoration: none;
+      font-size: 16px;
+    }
+
+    .welcome {
+      padding: 30px 10px;
+    }
+
+    .welcome h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .welcome p {
+      font-size: 16px;
+    }
+
+    .game-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .game-tile {
+      background-color: #1f1f1f;
+      border: 2px solid #d4af37;
+      border-radius: 12px;
+      width: 100px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #d4af37;
+      text-decoration: none;
+    }
+
+    .game-tile:hover {
+      background-color: #d4af37;
+      color: #111;
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <a href="mobile.html">Home</a>
+    <a href="mobile-games.html">Games</a>
+    <a href="mobile-shop.html">Shop</a>
+    <a href="mobile-rewards.html">Rewards</a>
+  </div>
+
+  <div class="welcome">
+    <h1>Velvet Palace Casino 🎰</h1>
+    <p>Tap a game below to begin playing!</p>
+  </div>
+
+  <div class="game-grid">
+    <a href="mobile-slots.html" class="game-tile">🎰<br>Slots</a>
+    <a href="mobile-poker.html" class="game-tile">🃏<br>Poker</a>
+    <a href="mobile-craps.html" class="game-tile">🎲<br>Craps</a>
+    <a href="mobile-mahjong.html" class="game-tile">🀄<br>Mahjong</a>
+    <a href="mobile-blackjack.html" class="game-tile">🏆<br>Blackjack</a>
+    <a href="mobile-fantasyspin.html" class="game-tile">🦄<br>Fantasy Spin</a>
+    <a href="mobile-dragonsluck.html" class="game-tile">🐉<br>Dragon’s Luck</a>
+    <a href="mobile-billiards.html" class="game-tile">🎱<br>Billiards</a>
+    <a href="mobile-gemrush.html" class="game-tile">💎<br>Gem Rush</a>
+  </div>
+
+  <audio id="bgMusic" src="bg-music.mp3" autoplay loop></audio>
+  <script>
+    // Ensure music auto-plays on user interaction
+    document.body.addEventListener('click', function () {
+      const music = document.getElementById('bgMusic');
+      if (music.paused) music.play();
+    }, { once: true });
+  </script>
+</body>
+</html>
