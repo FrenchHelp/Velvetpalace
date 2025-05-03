@@ -13,24 +13,62 @@
       color: #d4af37;
       margin: 0;
       padding: 0;
-      text-align: center;
     }
 
     .navbar {
       background-color: #111;
-      padding: 15px;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       border-bottom: 2px solid #d4af37;
+      position: relative;
     }
 
-    .navbar a {
+    .hamburger {
+      font-size: 24px;
+      cursor: pointer;
+      background: none;
+      border: none;
       color: #d4af37;
-      margin: 0 10px;
+    }
+
+    .nav-links {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      background-color: #111;
+      display: none;
+      flex-direction: column;
+      border-top: 1px solid #d4af37;
+      z-index: 99;
+    }
+
+    .nav-links a {
+      color: #d4af37;
+      padding: 12px;
+      border-bottom: 1px solid #333;
+      text-align: center;
       text-decoration: none;
-      font-size: 16px;
+      font-size: 18px;
+    }
+
+    .nav-links.show {
+      display: flex;
+    }
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid #d4af37;
+      font-size: 14px;
     }
 
     .welcome {
-      padding: 30px 10px;
+      text-align: center;
+      padding: 30px 20px;
     }
 
     .welcome h1 {
@@ -40,29 +78,25 @@
 
     .welcome p {
       font-size: 16px;
+      margin-bottom: 20px;
     }
 
-    .game-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 15px;
-      padding: 20px;
+      padding: 0 20px 40px;
     }
 
     .game-tile {
       background-color: #1f1f1f;
       border: 2px solid #d4af37;
-      border-radius: 12px;
-      width: 100px;
-      height: 100px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      font-size: 16px;
       color: #d4af37;
-      text-decoration: none;
+      transition: background-color 0.3s ease;
     }
 
     .game-tile:hover {
@@ -70,57 +104,61 @@
       color: #111;
     }
 
-    audio {
-      display: none;
+    .game-tile span {
+      font-size: 28px;
+      display: block;
+      margin-bottom: 8px;
     }
   </style>
 </head>
 <body>
 
   <div class="navbar">
-    <a href="mobile.html">Home</a>
-    <a href="mobile-games.html">Games</a>
-    <a href="mobile-shop.html">Shop</a>
-    <a href="mobile-rewards.html">Rewards</a>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+    <div class="coin-counter">Coins: <span id="coinCount">1000</span></div>
+  </div>
+
+  <div class="nav-links" id="mobileMenu">
+    <a href="home.html">Home</a>
+    <a href="shop.html">Shop</a>
+    <a href="rewards.html">Rewards</a>
+    <a href="games.html">Games</a>
   </div>
 
   <div class="welcome">
-    <h1>Velvet Palace Casino 🎰</h1>
-    <p>Tap a game below to begin playing!</p>
+    <h1>Velvet Palace Casino</h1>
+    <p>🎰 Swipe, tap, and win!</p>
   </div>
 
-  <div class="game-grid">
-    <a href="mobile-slots.html" class="game-tile">🎰<br>Slots</a>
-    <a href="mobile-poker.html" class="game-tile">🃏<br>Poker</a>
-    <a href="mobile-craps.html" class="game-tile">🎲<br>Craps</a>
-    <a href="mobile-mahjong.html" class="game-tile">🀄<br>Mahjong</a>
-    <a href="mobile-blackjack.html" class="game-tile">🏆<br>Blackjack</a>
-    <a href="mobile-fantasyspin.html" class="game-tile">🦄<br>Fantasy Spin</a>
-    <a href="mobile-dragonsluck.html" class="game-tile">🐉<br>Dragon’s Luck</a>
-    <a href="mobile-billiards.html" class="game-tile">🎱<br>Billiards</a>
-    <a href="mobile-gemrush.html" class="game-tile">💎<br>Gem Rush</a>
+  <div class="games-grid">
+    <a class="game-tile" href="slots.html">
+      <span>🎰</span>Slots
+    </a>
+    <a class="game-tile" href="poker.html">
+      <span>🃏</span>Poker
+    </a>
+    <a class="game-tile" href="blackjack.html">
+      <span>🏆</span>Blackjack
+    </a>
+    <a class="game-tile" href="gemrush.html">
+      <span>💎</span>Gem Rush
+    </a>
+    <a class="game-tile" href="dragonsluck.html">
+      <span>🐉</span>Dragon’s Luck
+    </a>
+    <a class="game-tile" href="billiards.html">
+      <span>🎱</span>Billiards
+    </a>
   </div>
 
-  <audio id="bgMusic" src="bg-music.mp3" autoplay loop></audio>
   <script>
-  function isMobileDevice() {
-    return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  }
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('show');
+    }
 
-  function fadeOutAndRedirect() {
-    // Apply the fade-out animation to the title and button
-    document.getElementById('enterTitle').classList.add('fade-out');
-    document.getElementById('enterButton').classList.add('fade-out');
-
-    // Redirect based on device type
-    setTimeout(function() {
-      if (isMobileDevice()) {
-        window.location.href = 'mobile.html';
-      } else {
-        window.location.href = 'home.html';
-      }
-    }, 1000); // Wait 1 second for the fade-out effect
-  }
-</script>
+    let coinCount = localStorage.getItem('coinCount') ? parseInt(localStorage.getItem('coinCount')) : 1000;
+    document.getElementById('coinCount').textContent = coinCount;
+  </script>
 </body>
 </html>
