@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gem Rush - Velvet Palace Casino</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #0a0a0a;
+      color: #d4af37;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #111;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    .nav-links a {
+      color: #d4af37;
+      text-decoration: none;
+      padding: 12px 24px;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .coin-counter {
+      background-color: #1f1f1f;
+      padding: 8px 20px;
+      border-radius: 30px;
+      border: 1px solid #d4af37;
+      font-size: 18px;
+    }
+
+    .game-container {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .game-title {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(8, 60px);
+      grid-template-rows: repeat(8, 60px);
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .gem {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .button-container {
+      margin-top: 20px;
+    }
+
+    .spin-button {
+      padding: 15px 40px;
+      font-size: 20px;
+      background-color: #d4af37;
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .spin-button:hover {
+      background-color: #fff;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 24px;
+      min-height: 30px;
+    }
+
+    #timer {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+
+    .power-up {
+      border: 2px solid #ff5733;
+      background-color: #ff5733;
+    }
+
+    .multiplier {
+      border: 2px solid #ffff00;
+      background-color: #ffff00;
+    }
+
+    .combo {
+      color: #ff00ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="games.html">Games</a>
+      <a href="shop.html">Shop</a>
+      <a href="rewards.html">Rewards</a>
+    </div>
+    <div class="coin-counter">Coins: <span id="coinCount">1000</span></div>
+  </div>
+
+  <div class="game-container">
+    <h1 class="game-title">💎 Gem Rush</h1>
+
+    <div class="grid-container" id="gemGrid"></div>
+
+    <div class="button-container">
+      <button class="spin-button" onclick="startGame()">Play (100 coins)</button>
+    </div>
+
+    <div id="result"></div>
+    <div id="timer"></div>
+  </div>
+
+  <!-- Background music -->
+  <audio id="bg-music" autoplay loop>
+    <source src="bg-music.mp3" type="audio/mp3" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    let coinCount = localStorage.getItem('coinCount') ? parseInt(localStorage.getItem('coinCount')) : 1000;
+    document.getElementById('coinCount').textContent = coinCount;
+
+    const gridSize = 8;
+    let grid = [];
+    let selectedGem = null;
+    let timer = 30;
+    let gameInterval;
+    let comboMultiplier = 1;
+
+    // Gem colors for the game
+    const gemColors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ff5733", "#ffff00"];
+
+    // Function to create a random grid with power-ups
+    function generateGrid() {
+      grid = [];
+      for (let row = 0; row < gridSize; row++) {
+        grid[row] = [];
+        for (let col = 0; col < gridSize; col++) {
+          let color = gemColors[Math.floor(Math.random() * gemColors.length)];
+          grid[row].push(color);
+        }
+      }
+
+      // Randomly add special gems (power-ups or multipliers)
+      for (let i = 0; i < 3; i++) {
+        let row = Math.floor(Math.random() * gridSize);
+        let col = Math.floor(Math.random() * gridSize);
+        grid[row][col] = "#ff5733"; // Power-up Gem
+      }
+      for (let i = 0; i < 3; i++) {
+        let row = Math.floor(Math.random() * gridSize);
+        let col = Math.floor(Math.random() * gridSize);
+        grid[row][col] = "#ffff00"; // Multiplier Gem
+      }
+    }
+
+    // Function to render the grid on the page
+    function renderGrid() {
+      const gemGrid = document.getElementById('gemGrid');
+      gemGrid.innerHTML = '';
+      for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+          let gemDiv = document.createElement('div');
+          gemDiv.classList.add('gem');
+          gemDiv.style.backgroundColor = grid[row][col];
+          gemDiv.setAttribute('data-row', row);
+          gemDiv.setAttribute('data-col', col);
+
+          // Add special gem class if it's a power-up or multiplier
+          if (grid[row][col] === "#ff5733") {
+            gemDiv.classList.add('power-up');
+          }
+          if (grid[row][col] === "#ffff00") {
+            gemDiv.classList.add('multiplier');
+          }
+
+          gemDiv.addEventListener('click', () => selectGem(row, col));
+          gemGrid.appendChild(gemDiv);
+        }
+      }
+    }
+
+    // Function to start the game
+    function startGame() {
+      if (coinCount < 100) {
+        document.getElementById("result").textContent = "Not enough coins!";
+        return;
+      }
+
+      // Deduct coins to play
+      updateCoinCount(coinCount - 100);
+
+      generateGrid();
+      renderGrid();
+      document.getElementById("result").textContent = "Match gems to earn coins!";
+      document.getElementById("timer").textContent = `Time left: ${timer}s`;
+
+      // Start timer
+      gameInterval = setInterval(updateTimer, 1000);
+    }
+
+    // Function to update the timer
+    function updateTimer() {
+      if (timer > 0) {
+        timer--;
+        document.getElementById("timer").textContent = `Time left: ${timer}s`;
+      } else {
+        clearInterval(gameInterval);
+        document.getElementById("result").textContent = "Time's up! Game Over!";
+        endGame();
+      }
+    }
+
+    // Function to select a gem
+    function selectGem(row, col) {
+      if (selectedGem) {
+        let [selRow, selCol] = selectedGem;
+        if (Math.abs(row - selRow) <= 1 && Math.abs(col - selCol) <= 1) {
+          // Swap the gems
+          swapGems(selRow, selCol, row, col);
+          checkMatches();
+        }
+        selectedGem = null;
+      } else {
+        selectedGem = [row, col];
+      }
+    }
+
+    // Function to swap gems
+    function swapGems(row1, col1, row2, col2) {
+      const temp = grid[row1][col1];
+      grid[row1][col1] = grid[row2][col2];
+      grid[row2][col2] = temp;
+      renderGrid();
+    }
+
+    // Function to check for matched gems and apply combos or power-ups
+    function checkMatches() {
+      let matches = 0;
+      let comboBonus = 1;
+
+      // Check horizontal matches
+      for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize - 2; col++) {
+          if (grid[row][col] === grid[row][col + 1] && grid[row][col] === grid[row][col + 2]) {
+            matches++;
+            grid[row][col] = grid[row][col + 1] = grid[row][col + 2] = null;
+          }
+        }
+      }
+
+      // Check vertical matches
+      for (let col = 0; col < gridSize; col++) {
+        for (let row = 0; row < gridSize - 2; row++) {
+          if (grid[row][col] === grid[row + 1][col] && grid[row][col] === grid[row + 2][col]) {
+            matches++;
+            grid[row][col] = grid[row + 1][col] = grid[row + 2][col] = null;
+          }
+        }
+      }
+
+      if (matches > 0) {
+        // Apply combo bonus multiplier
+        let totalCoins = matches * 50 * comboBonus;
+        updateCoinCount(coinCount + totalCoins);
+        document.getElementById("result").textContent = `You earned ${totalCoins} coins!`;
+        comboMultiplier++; // Increase combo multiplier for next match
+      } else {
+        document.getElementById("result").textContent = "No matches. Try again!";
+      }
+
+      renderGrid();
+    }
+
+    // Function to update coin count and local storage
+    function updateCoinCount(newAmount) {
+      coinCount = newAmount;
+      localStorage.setItem('coinCount', coinCount);
+      document.getElementById('coinCount').textContent = coinCount;
+    }
+
+    // End the game and reset
+    function endGame() {
+      setTimeout(() => {
+        updateCoinCount(coinCount);
+        document.getElementById("result").textContent = "Game over. You can play again!";
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
